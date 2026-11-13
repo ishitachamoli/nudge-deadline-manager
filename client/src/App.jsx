@@ -173,10 +173,10 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="container flex items-center justify-between h-16">
+      <header className="header sticky top-0 z-10">
+        <div className="container header-content">
           <h1 className="text-xl font-semibold text-gray-900">Nudge</h1>
           <button className="btn btn-primary" onClick={openCreateModal}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,36 +199,45 @@ function App() {
 
         {/* Stats Overview */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <div className="card">
-            <div className="card-body">
-              <p className="text-sm text-gray-500">Total Reminders</p>
-              <p className="text-3xl font-semibold text-gray-900">{reminders.length}</p>
+          <div className="stat-card p-6">
+            <div className="stat-icon primary">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
             </div>
+            <p className="stat-label">Total Reminders</p>
+            <p className="stat-value">{reminders.length}</p>
           </div>
-          <div className="card">
-            <div className="card-body">
-              <p className="text-sm text-gray-500">Pending</p>
-              <p className="text-3xl font-semibold text-gray-900">{pendingReminders.length}</p>
+          <div className="stat-card p-6">
+            <div className="stat-icon warning">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </div>
+            <p className="stat-label">Pending</p>
+            <p className="stat-value">{pendingReminders.length}</p>
           </div>
-          <div className="card">
-            <div className="card-body">
-              <p className="text-sm text-gray-500">Overdue</p>
-              <p className="text-3xl font-semibold text-danger">{overdueReminders.length}</p>
+          <div className="stat-card p-6">
+            <div className="stat-icon danger">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
             </div>
+            <p className="stat-label">Overdue</p>
+            <p className="stat-value text-danger">{overdueReminders.length}</p>
           </div>
         </div>
 
         {/* Tabs */}
         <div className="mb-4 border-b border-gray-200">
-          <nav className="flex gap-4" aria-label="Reminder filters">
-            <button className="px-3 py-2 text-sm font-medium text-primary border-b-2 border-primary">
+          <nav className="flex gap-1" aria-label="Reminder filters">
+            <button className="px-4 py-2 text-sm font-medium text-primary border-b-2 border-primary -mb-px">
               Upcoming ({pendingReminders.filter(r => new Date(r.dueDate) >= new Date()).length})
             </button>
-            <button className="px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900">
+            <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 border-b-2 border-transparent -mb-px hover:border-gray-200">
               Overdue ({overdueReminders.length})
             </button>
-            <button className="px-3 py-2 text-sm font-medium text-gray-500 hover:text-gray-900">
+            <button className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-900 border-b-2 border-transparent -mb-px hover:border-gray-200">
               Completed ({completedReminders.length})
             </button>
           </nav>
@@ -237,16 +246,21 @@ function App() {
         {/* Upcoming Reminders */}
         <section className="card mb-6">
           <div className="card-header">
-            <h2 className="text-lg font-semibold">Upcoming Reminders</h2>
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Upcoming Reminders
+            </h2>
           </div>
-          <div className="card-body">
+          <div className="card-body p-0">
             {pendingReminders.length === 0 ? (
               <div className="empty-state">
                 <svg className="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <p className="empty-state-title">No upcoming reminders</p>
-                <p className="text-sm">Create your first reminder to get started</p>
+                <p className="empty-state-description">Create your first reminder to get started</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -324,11 +338,16 @@ function App() {
 
         {/* Overdue Reminders */}
         {overdueReminders.length > 0 && (
-          <section className="card mb-6">
-            <div className="card-header">
-              <h2 className="text-lg font-semibold text-danger">Overdue Reminders</h2>
+          <section className="card mb-6 border-danger/30">
+            <div className="card-header bg-danger-light/50">
+              <h2 className="text-lg font-semibold text-danger flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                Overdue Reminders
+              </h2>
             </div>
-            <div className="card-body">
+            <div className="card-body p-0">
               <div className="overflow-x-auto">
                 <table className="table">
                   <thead>
@@ -344,12 +363,12 @@ function App() {
                     {overdueReminders
                       .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
                       .map((reminder) => (
-                        <tr key={reminder.id} className="bg-danger-light/50">
+                        <tr key={reminder.id} className="table-row-overdue">
                           <td className="font-medium">{reminder.title}</td>
                           <td>
                             <span className="badge badge-primary">{reminder.category}</span>
                           </td>
-                          <td className="text-danger">{formatDate(reminder.dueDate)}</td>
+                          <td className="text-danger font-medium">{formatDate(reminder.dueDate)}</td>
                           <td>
                             <span className={getPriorityBadge(reminder.priority)}>
                               {reminder.priority}
@@ -361,12 +380,18 @@ function App() {
                                 className="btn btn-ghost btn-sm"
                                 onClick={() => openEditModal(reminder)}
                               >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
                                 Reschedule
                               </button>
                               <button
                                 className="btn btn-success btn-sm"
                                 onClick={() => handleComplete(reminder.id)}
                               >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
                                 Complete
                               </button>
                             </div>
@@ -384,9 +409,14 @@ function App() {
         {completedReminders.length > 0 && (
           <section className="card mb-6">
             <div className="card-header">
-              <h2 className="text-lg font-semibold">Completed Reminders</h2>
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <svg className="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Completed Reminders
+              </h2>
             </div>
-            <div className="card-body">
+            <div className="card-body p-0">
               <div className="overflow-x-auto">
                 <table className="table">
                   <thead>
@@ -405,7 +435,7 @@ function App() {
                           <td>{reminder.title}</td>
                           <td><span className="badge badge-primary">{reminder.category}</span></td>
                           <td>{formatDate(reminder.dueDate)}</td>
-                          <td>{formatDate(reminder.updatedAt)}</td>
+                          <td><span className="text-sm text-gray-500">{formatDate(reminder.updatedAt)}</span></td>
                         </tr>
                       ))}
                   </tbody>
@@ -418,7 +448,12 @@ function App() {
         {/* Notification History */}
         <section className="card">
           <div className="card-header flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Notification History</h2>
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              Notification History
+            </h2>
             <button className="btn btn-ghost btn-sm" onClick={fetchNotifications}>
               <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -426,14 +461,14 @@ function App() {
               Refresh
             </button>
           </div>
-          <div className="card-body">
+          <div className="card-body p-0">
             {notifications.length === 0 ? (
               <div className="empty-state">
                 <svg className="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
                 <p className="empty-state-title">No notifications yet</p>
-                <p className="text-sm">Notifications will appear here when reminders are due</p>
+                <p className="empty-state-description">Notifications will appear here when reminders are due</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -464,7 +499,9 @@ function App() {
                               {notification.status}
                             </span>
                           </td>
-                          <td>{notification.attemptCount}</td>
+                          <td>
+                            <span className="badge badge-gray">{notification.attemptCount}</span>
+                          </td>
                           <td className="text-sm text-gray-500 max-w-xs truncate" title={notification.errorMessage}>
                             {notification.errorMessage || '-'}
                           </td>

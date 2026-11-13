@@ -32,12 +32,13 @@ async function start() {
     // Set environment variable for both processes
     process.env.MONGODB_URI = uri;
     process.env.NODE_ENV = 'development';
+    process.env.PORT = '3000';
 
     // Start API Server
     console.log('\n[Startup] Starting API Server...');
     serverProcess = spawn('node', ['src/index.js'], {
       cwd: path.join(__dirname, 'server'),
-      env: { ...process.env, MONGODB_URI: uri },
+      env: { ...process.env, MONGODB_URI: uri, PORT: '3000' },
       stdio: 'inherit'
     });
 
@@ -48,7 +49,7 @@ async function start() {
     console.log('\n[Startup] Starting Scheduler...');
     schedulerProcess = spawn('node', ['src/index.js'], {
       cwd: path.join(__dirname, 'scheduler'),
-      env: { ...process.env, MONGODB_URI: uri },
+      env: { ...process.env, MONGODB_URI: uri, PORT: '3000' },
       stdio: 'inherit'
     });
 
