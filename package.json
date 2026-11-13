@@ -1,0 +1,20 @@
+{
+  "name": "nudge",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["client", "server", "shared", "scheduler"],
+  "scripts": {
+    "dev": "concurrently \"npm:dev --workspace client\" \"npm:dev --workspace server\"",
+    "dev:scheduler": "npm run dev --workspace scheduler",
+    "dev:all": "concurrently \"npm:dev --workspace client\" \"npm:dev --workspace server\" \"npm:dev --workspace scheduler\"",
+    "dev:shared": "node start-dev.js",
+    "install:all": "npm install",
+    "install:client": "npm install --workspace client",
+    "install:server": "npm install --workspace server",
+    "install:shared": "npm install --workspace shared",
+    "install:scheduler": "npm install --workspace scheduler"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
