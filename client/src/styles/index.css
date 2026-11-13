@@ -1126,3 +1126,25 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Fix SVG icon sizes */
+.w-5 {
+  width: 20px;
+}
+
+.h-5 {
+  height: 20px;
+}
+
+.w-4 {
+  width: 16px;
+}
+
+.h-4 {
+  height: 16px;
+}
+
+/* Prevent icons from stretching */
+svg {
+  flex-shrink: 0;
+}
