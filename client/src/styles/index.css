@@ -969,6 +969,7 @@ a:hover { color: var(--color-primary-light); }
   .reveal { opacity: 1; transform: none; transition: none; }
 }
 
+<<<<<<< HEAD
 /* =========================================
    RESPONSIVE
 ========================================= */
@@ -1016,3 +1017,12 @@ a:hover { color: var(--color-primary-light); }
 }
 .animate-spin { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* =========================================
+   SVG ICON UTILITIES (from remote)
+========================================= */
+.w-5 { width: 20px; }
+.h-5 { height: 20px; }
+.w-4 { width: 16px; }
+.h-4 { height: 16px; }
+svg { flex-shrink: 0; }
