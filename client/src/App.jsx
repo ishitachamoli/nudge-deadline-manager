@@ -766,6 +766,7 @@ const CompletedPanel = ({ reminders, formatDate, getPriorityBadge }) => {
    MODAL (Liquid Glass)
 ========================================= */
 const ReminderModal = ({
+  
   isOpen,
   onClose,
   editingReminder,
@@ -821,6 +822,7 @@ const ReminderModal = ({
             <input
               type="text"
               id="title"
+               name="title"  
               className={`input ${formErrors.title ? 'border-danger' : ''}`}
               value={formData.title}
               onChange={handleChange}
@@ -836,6 +838,7 @@ const ReminderModal = ({
             <textarea
               id="description"
               className="input textarea"
+               name="description"
               value={formData.description}
               onChange={handleChange}
               placeholder="Optional description"
@@ -848,6 +851,7 @@ const ReminderModal = ({
               <label htmlFor="category" className="label">Category</label>
               <select
                 id="category"
+                 name="category"
                 className="input select"
                 value={formData.category}
                 onChange={handleChange}
@@ -860,6 +864,7 @@ const ReminderModal = ({
               <label htmlFor="priority" className="label">Priority</label>
               <select
                 id="priority"
+                 name="priority"
                 className="input select"
                 value={formData.priority}
                 onChange={handleChange}
@@ -874,6 +879,7 @@ const ReminderModal = ({
             <input
               type="datetime-local"
               id="dueDate"
+                name="dueDate"
               className={`input ${formErrors.dueDate ? 'border-danger' : ''}`}
               value={formData.dueDate}
               onChange={handleChange}
@@ -886,6 +892,7 @@ const ReminderModal = ({
             <input
               type="text"
               id="timezone"
+               name="timezone"
               className="input"
               value={formData.timezone}
               onChange={handleChange}
@@ -1036,19 +1043,13 @@ function App() {
 
   return (
     <div style={{minHeight:'100dvh',background:'#050508'}}>
-      {/* Cinematic Hero */}
-      <Hero onNewReminder={openCreateModal} />
+     {/* Cinematic Hero */}
+<Hero onNewReminder={openCreateModal} />
 
-      {/* Scroll Story */}
-      <ScrollStory />
+{/* Stats with CountUp */}
+<CinematicStats reminders={reminders} />
 
-      {/* Depth Carousel — Featured Reminders */}
-      <ReminderDepthCarousel reminders={reminders} />
-
-      {/* Stats with CountUp */}
-      <CinematicStats reminders={reminders} />
-
-      {/* Dashboard — Functional Core */}
+{/* Dashboard — Functional Core */}
       <Dashboard
         reminders={reminders}
         notifications={notifications}
