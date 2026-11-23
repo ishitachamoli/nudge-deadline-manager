@@ -1,67 +1,106 @@
 /**
  * Process Due Reminders Job
- * Finds reminders that are due and creates notification logs for them.
- * This job runs periodically to schedule notifications.
+ * Finds pending reminders that are due and creates notification logs for them.
  */
 
-const { REMINDER_STATUS, NOTIFICATION_STATUS } = require('@nudge/shared');
+const { REMINDER_STATUS, NOTIFICATION_STATUS, SCHEDULER_JOB_TYPES } = require('@nudge/shared');
+
+function logJobSummary(payload) {
+  console.log(JSON.stringify({
+    timestamp: new Date().toISOString(),
+    job: SCHEDULER_JOB_TYPES.PROCESS_DUE_REMINDERS,
+    ...payload
+  }));
+}
+
+function buildIdempotencyKey(reminderId, scheduledAt, attempt = 0) {
+  const isoTime = new Date(scheduledAt).toISOString();
+  return `${reminderId}:${isoTime}:${attempt}`;
+}
 
 /**
  * Create notification logs for due reminders
  * @param {Object} Reminder - Mongoose Reminder model
  * @param {Object} NotificationLog - Mongoose NotificationLog model
- * @returns {Promise<{created: number, skipped: number}>}
+ * @returns {Promise<{created: number, skipped: number, remindersProcessed: number, notificationsSent: number, retriesScheduled: number, failures: number}>}
  */
 async function processDueReminders(Reminder, NotificationLog) {
+  const startedAt = Date.now();
   const now = new Date();
 
-  // Find pending reminders that are due (dueDate <= now)
   const dueReminders = await Reminder.find({
     status: REMINDER_STATUS.PENDING,
     dueDate: { $lte: now }
   }).select('_id dueDate title').lean();
 
-  if (dueReminders.length === 0) {
-    return { created: 0, skipped: 0 };
+  if (!dueReminders || dueReminders.length === 0) {
+    const summary = {
+      created: 0,
+      skipped: 0,
+      remindersProcessed: 0,
+      notificationsSent: 0,
+      retriesScheduled: 0,
+      failures: 0,
+      durationMs: Date.now() - startedAt
+    };
+    logJobSummary(summary);
+    return summary;
   }
 
   let created = 0;
   let skipped = 0;
+  let failures = 0;
 
   for (const reminder of dueReminders) {
-    // Idempotency key: reminderId + scheduledAt (rounded to minute)
-    const scheduledAt = reminder.dueDate;
-    const idempotencyKey = `${reminder._id}:${scheduledAt.getTime()}`;
+    const scheduledAt = new Date(reminder.dueDate);
+    const attempt = 0;
+    const idempotencyKey = buildIdempotencyKey(reminder._id, scheduledAt, attempt);
 
-    // Check if notification already exists (idempotency)
     const existing = await NotificationLog.findOne({ idempotencyKey }).lean();
-
     if (existing) {
       skipped++;
       continue;
     }
 
-    // Create notification log
-    await NotificationLog.create({
-      reminderId: reminder._id,
-      scheduledAt,
-      attemptedAt: null,
-      status: NOTIFICATION_STATUS.PENDING,
-      attemptCount: 0,
-      idempotencyKey,
-      errorMessage: null,
-      nextRetryAt: null
-    });
-
-    created++;
+    try {
+      await NotificationLog.create({
+        reminderId: reminder._id,
+        scheduledAt,
+        attemptedAt: null,
+        status: NOTIFICATION_STATUS.PENDING,
+        attemptCount: attempt,
+        idempotencyKey,
+        errorMessage: null,
+        nextRetryAt: null
+      });
+      created++;
+    } catch (err) {
+      // Handle race condition / unique index duplicate key error idempotently
+      if (err && (err.code === 11000 || /duplicate key/i.test(err.message || ''))) {
+        skipped++;
+      } else {
+        failures++;
+        throw err;
+      }
+    }
   }
 
-  return { created, skipped };
+  const summary = {
+    created,
+    skipped,
+    remindersProcessed: dueReminders.length,
+    notificationsSent: 0,
+    retriesScheduled: 0,
+    failures,
+    durationMs: Date.now() - startedAt
+  };
+
+  logJobSummary(summary);
+  return summary;
 }
 
 /**
  * Clean up stale pending notifications
- * Notifications that have been pending for too long without being processed
  * @param {Object} NotificationLog - Mongoose model
  * @param {number} staleThresholdMs - Threshold in milliseconds
  * @returns {Promise<number>} Number of cleaned up notifications
@@ -77,7 +116,7 @@ async function cleanupStaleNotifications(NotificationLog, staleThresholdMs = 5 *
     {
       status: NOTIFICATION_STATUS.FAILED,
       errorMessage: 'Stale notification - scheduler did not process in time',
-      nextRetryAt: new Date(Date.now() + 60000) // Retry in 1 minute
+      nextRetryAt: new Date(Date.now() + 60000)
     }
   );
 
@@ -86,5 +125,6 @@ async function cleanupStaleNotifications(NotificationLog, staleThresholdMs = 5 *
 
 module.exports = {
   processDueReminders,
-  cleanupStaleNotifications
+  cleanupStaleNotifications,
+  buildIdempotencyKey
 };

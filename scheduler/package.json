@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "dev:mem": "node src/index.dev.js"
+    "dev:mem": "node src/index.dev.js",
+    "test": "node --test"
   },
   "dependencies": {
     "mongoose": "^8.5.0",
