@@ -262,18 +262,38 @@ const DepthCarousel = ({
     setFocus(Math.round(projected), true);
   }, [setFocus]);
 
-  const onKeyDown = useCallback(
-    e => {
+ const onKeyDown = useCallback(
+  e => {
+    if (e.target.closest('.depth-carousel__dots')) {
+      const currentIndex = focusRef.current;
+
       if (e.key === 'ArrowLeft') {
         e.preventDefault();
-        navigateBy(-1);
+        setFocus(currentIndex - 1, true);
       } else if (e.key === 'ArrowRight') {
         e.preventDefault();
-        navigateBy(1);
+        setFocus(currentIndex + 1, true);
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        setFocus(0, true);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        setFocus(count - 1, true);
       }
-    },
-    [navigateBy]
-  );
+
+      return;
+    }
+
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      navigateBy(-1);
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      navigateBy(1);
+    }
+  },
+  [navigateBy, setFocus, count]
+);
 
   const onCardClick = useCallback(
     index => {
@@ -359,16 +379,26 @@ const DepthCarousel = ({
       <div className="depth-carousel__stage" ref={stageRef}>
         {data.map((item, i) => (
           <div
-            key={i}
-            className="depth-carousel__card"
-            ref={el => (cardRefs.current[i] = el)}
-            style={{ width: cardWidth, height: cardHeight, borderRadius: radius }}
-            aria-roledescription="slide"
-            aria-label={`${i + 1} of ${count}`}
-            aria-hidden={active !== i}
-            onClick={() => onCardClick(i)}
-          >
-            <img className="depth-carousel__img" src={item.image} alt={item.alt || ''} draggable={false} />
+  key={i}
+  id={`depth-slide-${i}`}
+  className="depth-carousel__card"
+  ref={el => (cardRefs.current[i] = el)}
+  style={{ width: cardWidth, height: cardHeight, borderRadius: radius }}
+  role="group"
+  aria-roledescription="slide"
+  aria-label={`${i + 1} of ${count}`}
+  aria-hidden={active !== i}
+  onClick={() => onCardClick(i)}
+>
+           <img
+  className="depth-carousel__img"
+  src={item.image}
+  alt={item.alt || ''}
+  loading="lazy"
+  decoding="async"
+  fetchPriority="low"
+  draggable={false}
+/>
             <span
               className="depth-carousel__tint"
               ref={el => (overlayRefs.current[i] = el)}
@@ -421,14 +451,17 @@ const DepthCarousel = ({
         <div className="depth-carousel__dots" role="tablist" aria-label="Slides">
           {data.map((_, i) => (
             <button
-              key={i}
-              type="button"
-              role="tab"
-              aria-selected={active === i}
-              aria-label={`Go to slide ${i + 1}`}
-              className={`depth-carousel__dot${active === i ? ' is-active' : ''}`}
-              onClick={() => setFocus(i, true)}
-            />
+  key={i}
+  id={`depth-tab-${i}`}
+  type="button"
+  role="tab"
+  aria-controls={`depth-slide-${i}`}
+  aria-selected={active === i}
+  tabIndex={active === i ? 0 : -1}
+  aria-label={`Go to slide ${i + 1}`}
+  className={`depth-carousel__dot${active === i ? ' is-active' : ''}`}
+  onClick={() => setFocus(i, true)}
+/>
           ))}
         </div>
       )}
