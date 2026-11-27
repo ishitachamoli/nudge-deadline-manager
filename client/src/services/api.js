@@ -134,4 +134,7 @@ export const healthApi = {
   }
 };
 
+api.reminders = remindersApi;
+api.notifications = notificationsApi;
+
 export default api;

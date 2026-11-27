@@ -408,6 +408,7 @@ const Dashboard = ({
   onDelete,
   onComplete,
   onRefreshNotifications,
+  onClearError,
   showModal,
   closeModal,
   editingReminder,
@@ -474,7 +475,7 @@ const Dashboard = ({
         >
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12}}>
             <span style={{color:'#ff9aa3'}}>{error}</span>
-            <button className="btn btn-ghost btn-sm" onClick={() => setError(null)}>Dismiss</button>
+            <button className="btn btn-ghost btn-sm" onClick={onClearError}>Dismiss</button>
           </div>
         </motion.div>
       )}
@@ -821,6 +822,7 @@ const ReminderModal = ({
             <input
               type="text"
               id="title"
+              name="title"
               className={`input ${formErrors.title ? 'border-danger' : ''}`}
               value={formData.title}
               onChange={handleChange}
@@ -835,6 +837,7 @@ const ReminderModal = ({
             <label htmlFor="description" className="label">Description</label>
             <textarea
               id="description"
+              name="description"
               className="input textarea"
               value={formData.description}
               onChange={handleChange}
@@ -848,6 +851,7 @@ const ReminderModal = ({
               <label htmlFor="category" className="label">Category</label>
               <select
                 id="category"
+                name="category"
                 className="input select"
                 value={formData.category}
                 onChange={handleChange}
@@ -860,6 +864,7 @@ const ReminderModal = ({
               <label htmlFor="priority" className="label">Priority</label>
               <select
                 id="priority"
+                name="priority"
                 className="input select"
                 value={formData.priority}
                 onChange={handleChange}
@@ -874,6 +879,7 @@ const ReminderModal = ({
             <input
               type="datetime-local"
               id="dueDate"
+              name="dueDate"
               className={`input ${formErrors.dueDate ? 'border-danger' : ''}`}
               value={formData.dueDate}
               onChange={handleChange}
@@ -886,6 +892,7 @@ const ReminderModal = ({
             <input
               type="text"
               id="timezone"
+              name="timezone"
               className="input"
               value={formData.timezone}
               onChange={handleChange}
@@ -963,7 +970,10 @@ function App() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -1059,6 +1069,7 @@ function App() {
         onDelete={handleDelete}
         onComplete={handleComplete}
         onRefreshNotifications={fetchNotifications}
+        onClearError={clearError}
         showModal={showModal}
         closeModal={closeModal}
         editingReminder={editingReminder}
