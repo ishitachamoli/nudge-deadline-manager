@@ -880,11 +880,7 @@ const ReminderModal = ({
             <input
               type="datetime-local"
               id="dueDate"
-<<<<<<< HEAD
               name="dueDate"
-=======
-                name="dueDate"
->>>>>>> origin/feature/scheduler
               className={`input ${formErrors.dueDate ? 'border-danger' : ''}`}
               value={formData.dueDate}
               onChange={handleChange}
