@@ -29,10 +29,18 @@ api.interceptors.response.use(
     if (error.response) {
       // Server responded with error status
       const message = error.response.data?.message || error.message;
-      return Promise.reject(new Error(message));
+
+      const apiError = new Error(message);
+      apiError.status = error.response.status;
+      apiError.data = error.response.data;
+
+      return Promise.reject(apiError);
+
     } else if (error.request) {
       // Network error
-      return Promise.reject(new Error('Network error - please check your connection'));
+      return Promise.reject(
+        new Error('Network error - please check your connection')
+      );
     } else {
       // Other error
       return Promise.reject(new Error(error.message));
@@ -134,7 +142,16 @@ export const healthApi = {
   }
 };
 
+// Attach to axios instance for backward compatibility
 api.reminders = remindersApi;
 api.notifications = notificationsApi;
+api.health = healthApi;
 
-export default api;
+// Export combined client object with all APIs
+const apiClient = {
+  reminders: remindersApi,
+  notifications: notificationsApi,
+  health: healthApi
+};
+
+export default apiClient;

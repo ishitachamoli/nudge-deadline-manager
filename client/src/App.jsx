@@ -42,6 +42,8 @@ const HeroVideo = () => {
       muted
       loop
       playsInline
+      preload="none"
+disablePictureInPicture
       poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080'%3E%3Crect fill='%23050508'/%3E%3C/svg%3E"
     >
       <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260511_230229_7c9bc431-46cf-489a-948d-e8144d8eb5d4.mp4" type="video/mp4" />
@@ -403,6 +405,7 @@ const Dashboard = ({
   notifications,
   loading,
   error,
+   setError,
   onCreate,
   onEdit,
   onDelete,
@@ -481,15 +484,11 @@ const Dashboard = ({
       )}
 
       {/* Tab Navigation */}
-      <div className="glass-panel mb-6" style={{padding:'6px',display:'inline-flex',gap:'4px',borderRadius:'var(--radius-full)'}}>
+     <div className="glass-panel reminder-tabs mb-6" style={{padding:'6px',display:'inline-flex',gap:'4px',borderRadius:'var(--radius-full)'}}>
         {tabs.map(tab => (
           <button
             key={tab.id}
-            className={`px-5 py-2.5 text-sm font-semibold rounded-full transition-all ${
-              activeTab === tab.id
-                ? 'bg-white/5 text-white shadow-md'
-                : 'text-gray-500 hover:text-white hover:bg-white/3'
-            }`}
+            className={`dashboard-tab ${activeTab === tab.id ? 'is-active' : ''}`}
             onClick={() => setActiveTab(tab.id)}
             aria-selected={activeTab === tab.id}
             role="tab"
@@ -536,12 +535,18 @@ const Dashboard = ({
       </div>
 
       {/* Notification History */}
-      <section className="card mt-6" id="notifications" aria-labelledby="notifications-title">
-        <div className="card-header flex items-center justify-between">
-          <h2 id="notifications-title" className="text-lg font-semibold flex items-center gap-2">
-            {icons.bell} Notification History
-          </h2>
-          <GlareHover
+      <section className="card mt-6" id="notifications" aria-labelledby="notifications-title" style={{ marginTop: '24px' }}>
+       <div className="card-header notification-header flex items-center justify-between">
+<h2
+  id="notifications-title"
+  className="notification-title text-lg font-semibold flex items-center gap-2"
+>
+  {icons.bell}
+  <span className="notification-heading-text">
+  <span>Notification</span>
+  <span>History</span>
+</span>
+</h2>   <GlareHover
             mode="hover"
             variant="sheen"
             glareColor="#ffffff"
@@ -676,7 +681,21 @@ const UpcomingPanel = ({ reminders, formatDate, getPriorityBadge, getStatusBadge
 };
 
 const OverduePanel = ({ reminders, formatDate, getPriorityBadge, onEdit, onComplete, spotlightRow, setSpotlightRow }) => {
-  if (reminders.length === 0) return null;
+  
+if (reminders.length === 0) {
+  return (
+    <div className="glass-panel py-12 text-center">
+      {icons.check}
+      <p className="empty-state-title mt-4">
+        You're all caught up!
+      </p>
+      <p className="empty-state-description mt-2">
+        No overdue reminders. Keep up the great work!
+      </p>
+    </div>
+  );
+}
+
   return (
     <div className="glass-panel overflow-hidden" style={{borderColor:'rgba(223,83,99,0.2)'}}>
       <div className="overflow-x-auto">
@@ -985,8 +1004,17 @@ function App() {
     if (errors.title || errors.dueDate) { setFormErrors(errors); return; }
     try {
       setLoading(true);
-      if (editingReminder) await api.reminders.update(editingReminder.id, formData);
-      else await api.reminders.create(formData);
+      // Convert datetime-local into a valid ISO datetime
+const payload = {
+  ...formData,
+  dueDate: new Date(formData.dueDate).toISOString()
+};
+
+if (editingReminder) {
+  await api.reminders.update(editingReminder.id, payload);
+} else {
+  await api.reminders.create(payload);
+}
       closeModal();
       fetchReminders();
     } catch (err) { setError(err.message); }
@@ -1037,13 +1065,50 @@ function App() {
   const clearError = () => setError(null);
 
   if (loading && reminders.length === 0) {
-    return (
-      <div style={{minHeight:'100dvh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'1rem',background:'#050508'}}>
-        <div className="spinner" style={{width:48,height:48,borderWidth:3}} />
-        <p style={{color:'var(--fg-60)'}}>Loading reminders...</p>
+  return (
+    <div className="dashboard-container">
+      <div className="dashboard-content">
+
+        {/* Header skeleton */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="space-y-3">
+            <div className="skeleton" style={{ width: 180, height: 28 }} />
+            <div className="skeleton" style={{ width: 260, height: 14 }} />
+          </div>
+          <div className="skeleton" style={{ width: 44, height: 44, borderRadius: '50%' }} />
+        </div>
+
+        {/* Stats skeleton */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {[1, 2, 3, 4].map((item) => (
+            <div className="glass-panel p-5" key={item}>
+              <div className="skeleton mb-4" style={{ width: 100, height: 14 }} />
+              <div className="skeleton mb-3" style={{ width: 140, height: 30 }} />
+              <div className="skeleton" style={{ width: 80, height: 12 }} />
+            </div>
+          ))}
+        </div>
+
+        {/* Main content skeleton */}
+        <div className="glass-panel p-6">
+          <div className="skeleton mb-6" style={{ width: 180, height: 22 }} />
+
+          {[1, 2, 3, 4].map((item) => (
+            <div className="flex items-center gap-4 mb-5" key={item}>
+              <div className="skeleton" style={{ width: 42, height: 42, borderRadius: 10 }} />
+              <div className="flex-1 space-y-2">
+                <div className="skeleton" style={{ width: '45%', height: 14 }} />
+                <div className="skeleton" style={{ width: '65%', height: 11 }} />
+              </div>
+              <div className="skeleton" style={{ width: 65, height: 16 }} />
+            </div>
+          ))}
+        </div>
+
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   return (
     <div style={{minHeight:'100dvh',background:'#050508'}}>
@@ -1059,6 +1124,7 @@ function App() {
         notifications={notifications}
         loading={loading}
         error={error}
+        setError={setError}
         onCreate={openCreateModal}
         onEdit={openEditModal}
         onDelete={handleDelete}
