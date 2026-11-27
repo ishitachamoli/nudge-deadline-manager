@@ -317,16 +317,24 @@ a:hover { color: var(--color-primary-light); }
 /* =========================================
    CURSOR SPOTLIGHT (mouse-scrubbed reveal)
 ========================================= */
+
 .spotlight-overlay {
   position: absolute;
   inset: 0;
-  z-index: 40;
+  z-index: 10;
   pointer-events: none;
-  mask: radial-gradient(700px circle at var(--mx, 50%) var(--my, 50%), #000 35%, transparent 75%);
-  -webkit-mask: radial-gradient(700px circle at var(--mx, 50%) var(--my, 50%), #000 35%, transparent 75%);
-  background: #0a0a14;
-  transition: mask 0.1s ease, -webkit-mask 0.1s ease;
+
+  /* Darken the outer area while keeping the cursor area clear */
+  background: radial-gradient(
+    700px circle at var(--mx, 50%) var(--my, 50%),
+    transparent 0%,
+    rgba(5, 5, 8, 0.15) 45%,
+    rgba(5, 5, 8, 0.55) 100%
+  );
+
+  transition: background 0.1s ease;
 }
+
 @supports not (mask: radial-gradient(circle, #000, transparent)) {
   .spotlight-overlay { display: none; }
 }
@@ -398,7 +406,7 @@ a:hover { color: var(--color-primary-light); }
    HERO COPY (bottom-left pinned)
 ========================================= */
 .hero-body {
-  margin-top: auto;
+  margin-top: clamp(2.5rem, 9vh, 5rem);
   padding-bottom: 7vh;
   max-width: 38rem;
 }

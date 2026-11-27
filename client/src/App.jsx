@@ -767,6 +767,7 @@ const CompletedPanel = ({ reminders, formatDate, getPriorityBadge }) => {
    MODAL (Liquid Glass)
 ========================================= */
 const ReminderModal = ({
+  
   isOpen,
   onClose,
   editingReminder,
@@ -879,7 +880,11 @@ const ReminderModal = ({
             <input
               type="datetime-local"
               id="dueDate"
+<<<<<<< HEAD
               name="dueDate"
+=======
+                name="dueDate"
+>>>>>>> origin/feature/scheduler
               className={`input ${formErrors.dueDate ? 'border-danger' : ''}`}
               value={formData.dueDate}
               onChange={handleChange}
@@ -1046,19 +1051,13 @@ function App() {
 
   return (
     <div style={{minHeight:'100dvh',background:'#050508'}}>
-      {/* Cinematic Hero */}
-      <Hero onNewReminder={openCreateModal} />
+     {/* Cinematic Hero */}
+<Hero onNewReminder={openCreateModal} />
 
-      {/* Scroll Story */}
-      <ScrollStory />
+{/* Stats with CountUp */}
+<CinematicStats reminders={reminders} />
 
-      {/* Depth Carousel — Featured Reminders */}
-      <ReminderDepthCarousel reminders={reminders} />
-
-      {/* Stats with CountUp */}
-      <CinematicStats reminders={reminders} />
-
-      {/* Dashboard — Functional Core */}
+{/* Dashboard — Functional Core */}
       <Dashboard
         reminders={reminders}
         notifications={notifications}
